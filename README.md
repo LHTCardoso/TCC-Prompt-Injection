@@ -6,6 +6,7 @@ Laboratório didático para **estudo de prompt injection** em um assistente-alvo
 
 ---
 [![Abrir no GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/LHTCardoso/TCC-Prompt-Injection?quickstart=1)
+---
 ## Sumário
 
 - [Visão geral](#visão-geral)
