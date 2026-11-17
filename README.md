@@ -5,6 +5,8 @@ Laboratório didático para **estudo de prompt injection** em um assistente-alvo
 > **Aviso ético:** use apenas em sistemas próprios ou com autorização explícita, respeitando os termos de uso dos provedores de modelo.
 
 ---
+> Ao abrir, aguarde alguns minutos (instalação do Ollama e download do modelo).
+> Se o laboratório não abrir sozinho, vá na aba **Portas** → linha **MailBot (3000)** → clique no ícone de 🌐.
 [![Abrir no GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/LHTCardoso/TCC-Prompt-Injection?quickstart=1)
 ---
 ## Sumário
