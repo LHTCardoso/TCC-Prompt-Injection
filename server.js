@@ -90,8 +90,11 @@ const server = http.createServer(async (req, res) => {
     }
     if (req.method === 'POST' && url.pathname === '/api/chat') {
       // Evita que outro site aberto no seu navegador use este servidor (e suas chaves) às escondidas.
-      const origin = req.headers.origin;
-      if (origin && !/^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin)) return json(res, 403, { error: 'Origem não permitida' });
+           const origin = req.headers.origin;
+      const okLocal = /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin);
+      const cs = process.env.CODESPACE_NAME;
+      const okCodespace = cs && origin === `https://${cs}-${PORT}.${process.env.GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}`;
+      if (origin && !okLocal && !okCodespace) return json(res, 403, { error: 'Origem não permitida' });
       return json(res, 200, await handleChat(await readJson(req)));
     }
     send(res, 404, 'text/plain; charset=utf-8', 'Não encontrado');
