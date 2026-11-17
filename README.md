@@ -5,20 +5,39 @@ Laboratório didático para **estudo de prompt injection** em um assistente-alvo
 > **Aviso ético:** use apenas em sistemas próprios ou com autorização explícita, respeitando os termos de uso dos provedores de modelo.
 
 ---
-> Ao abrir, aguarde alguns minutos (instalação do Ollama e download do modelo).
-> Se o laboratório não abrir sozinho, vá na aba **Portas** → linha **MailBot (3000)** → clique no ícone de 🌐.
+
+## Executar online (sem instalar nada)
 
 [![Abrir no GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/LHTCardoso/TCC-Prompt-Injection?quickstart=1)
+
+1. Clique no botão acima (é preciso estar logado no GitHub).
+2. Aguarde alguns minutos na primeira abertura: o ambiente instala o Ollama e baixa o modelo `llama3.1:8b` (~5 GB).
+3. O laboratório sobe sozinho na porta **3000**. Se não abrir automaticamente, vá na aba **Portas** → linha **MailBot (3000)** → clique no ícone 🌐.
+4. Antes do primeiro teste, confira no terminal se o modelo terminou de baixar:
+
+   ```bash
+   ollama list
+   ```
+
+   Quando `llama3.1:8b` aparecer na lista, é só conversar com o MailBot.
+
+> **Observações**
+> - O Codespace roda sem GPU, então as respostas são mais lentas do que em uma máquina local.
+> - O uso consome a cota gratuita mensal de Codespaces da conta de quem abre.
+> - Ao terminar, apague o Codespace em [github.com/codespaces](https://github.com/codespaces) para não gastar cota.
+
 ---
+
 ## Sumário
 
+- [Executar online (sem instalar nada)](#executar-online-sem-instalar-nada)
 - [Visão geral](#visão-geral)
 - [Arquitetura do MailBot](#arquitetura-do-mailbot)
 - [Ameaças modeladas](#ameaças-modeladas)
 - [Defesas implementadas](#defesas-implementadas)
 - [Estrutura do projeto](#estrutura-do-projeto)
 - [Requisitos](#requisitos)
-- [Como executar](#como-executar)
+- [Como executar localmente](#como-executar-localmente)
   - [Modo interativo (chat web)](#modo-interativo-chat-web)
   - [Modo em lote (experimentos)](#modo-em-lote-experimentos)
 - [Métricas e saídas](#métricas-e-saídas)
@@ -39,13 +58,14 @@ O laboratório avalia se o modelo pode ser induzido a violar políticas (vazar s
 
 ## Arquitetura do MailBot
 
-- **`server.js`** — servidor HTTP local (`127.0.0.1`) que expõe a UI e a API (`/api/config`, `/api/chat`). Mantém chaves de API no ambiente do servidor (nunca no navegador) e valida `Origin`.
+- **`server.js`** — servidor HTTP local (`127.0.0.1`) que expõe a UI e a API (`/api/config`, `/api/chat`). Mantém chaves de API no ambiente do servidor (nunca no navegador) e valida `Origin`: aceita `localhost`, o próprio GitHub Codespace em que está rodando e, opcionalmente, o endereço definido em `ALLOWED_ORIGIN`.
 - **`index.html`** — interface interativa: chat, seleção de modelo, ativação de defesas, injeção indireta via documento, biblioteca de payloads, inspetor (system/mensagem/saída bruta), placar, medidor de violação e exportação de log.
 - **`providers.js`** — integração com provedores (`ollama`, `anthropic`, `openai` compatível) e modo `mock` (dry-run).
 - **`payloads.js`** — configuração do alvo (canário, marcador, domínio permitido), prompt do sistema, payloads de ataque e tarefas legítimas.
 - **`defenses.js`** — composição de prompt, filtro de entrada, parsing/validação de ferramenta e DLP/guard de saída.
 - **`judge.js`** — juízes automáticos de sucesso (leak/tool/hijack) e pontuação heurística de “proximidade da violação”.
 - **`lab.js`** — executor em lote: roda combinações (payload × vetor × defesa × repetições + tarefas benignas) e gera relatório/JSON/CSV.
+- **`.devcontainer/devcontainer.json`** — configuração do GitHub Codespaces: instala o Ollama, baixa o modelo e inicia o servidor automaticamente.
 
 ## Ameaças modeladas
 
@@ -79,6 +99,8 @@ Override ingênuo, falsa autoridade, ofuscação (base64), outro idioma, role-pl
 
 ```text
 .
+├─ .devcontainer/
+│  └─ devcontainer.json # ambiente do GitHub Codespaces (Ollama + modelo + servidor)
 ├─ server.js            # servidor web local + API
 ├─ index.html           # UI interativa do laboratório
 ├─ lab.js               # execução em lote e geração de relatório
@@ -93,13 +115,15 @@ Override ingênuo, falsa autoridade, ofuscação (base64), outro idioma, role-pl
 
 ## Requisitos
 
-- **Node.js 18+** (usa `fetch` nativo). Sem dependências de runtime.
-- Opcional, conforme provedor:
-  - **Ollama** em execução local (padrão `http://127.0.0.1:11434`)
-  - `ANTHROPIC_API_KEY` para Anthropic
-  - `OPENAI_API_KEY` e opcional `OPENAI_BASE_URL` para APIs compatíveis com OpenAI
+- **Para executar online:** apenas uma conta no GitHub (veja [Executar online](#executar-online-sem-instalar-nada)).
+- **Para executar localmente:**
+  - **Node.js 18+** (usa `fetch` nativo). Sem dependências de runtime.
+  - Opcional, conforme provedor:
+    - **Ollama** em execução local (padrão `http://127.0.0.1:11434`)
+    - `ANTHROPIC_API_KEY` para Anthropic
+    - `OPENAI_API_KEY` e opcional `OPENAI_BASE_URL` para APIs compatíveis com OpenAI
 
-## Como executar
+## Como executar localmente
 
 ### Modo interativo (chat web)
 
@@ -139,6 +163,8 @@ Opções principais:
 - `--out` diretório de saída (padrão `results`)
 
 > Dica: rode com `--n 1` para estimar custo/tempo (11 payloads × 2 vetores × 7 defesas × n + tarefas legítimas). Para comparar modelos, use diretórios diferentes (ex.: `--out results-<modelo>`).
+>
+> O modo em lote também funciona dentro do Codespaces: abra um terminal novo e rode os mesmos comandos. Sem GPU, ele demora bem mais do que em uma máquina local.
 
 ## Métricas e saídas
 
@@ -159,6 +185,7 @@ Saídas em `results/` (ou `--out`):
 - **Não determinismo:** respostas variam entre execuções; use repetições (`--n`) e intervalos de confiança.
 - **Simulação:** ferramenta de e-mail não envia mensagens reais; `mock` valida apenas o pipeline.
 - **Fronteira de confiança:** delimitação de contexto reduz risco, mas não cria isolamento forte por si só; controles efetivos exigem enforcement no backend (ex.: D4/D6) e minimização de dados sensíveis no prompt.
+- **Ambiente online:** no Codespaces o modelo roda apenas em CPU; o comportamento é o mesmo do modelo local, mas a latência é maior.
 
 ## Extensões sugeridas
 
