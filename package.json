@@ -1,0 +1,15 @@
+{
+  "name": "pi-lab",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Laboratório de prompt injection (em lote e interativo) para TCC",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "dry": "node lab.js --provider mock --n 2",
+    "start": "node lab.js",
+    "web": "node server.js"
+  }
+}
