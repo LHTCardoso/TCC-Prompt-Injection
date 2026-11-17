@@ -1,0 +1,12 @@
+{
+  "name": "pi-lab",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
+  "hostRequirements": { "cpus": 4, "memory": "16gb" },
+  "postCreateCommand": "curl -fsSL https://ollama.com/install.sh | sh && npm install",
+  "postStartCommand": "nohup ollama serve > /tmp/ollama.log 2>&1 & sleep 5 && ollama pull llama3.2:3b",
+  "postAttachCommand": "node server.js",
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": { "label": "MailBot", "onAutoForward": "openBrowser" }
+  }
+}
