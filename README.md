@@ -5,6 +5,7 @@ Laboratório didático para **estudo de prompt injection** em um assistente-alvo
 > **Aviso ético:** use apenas em sistemas próprios ou com autorização explícita, respeitando os termos de uso dos provedores de modelo.
 
 ---
+[![Abrir no GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/LHTCardoso/TCC-Prompt-Injection?quickstart=1)
 
 ## Sumário
 
